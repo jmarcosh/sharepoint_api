@@ -1,2 +1,11 @@
 # Secrets
-config_files/secrets.toml
+credentials/secrets.toml
+
+# Ignore virtual environments
+.venv/
+env/
+
+# Ignore build artifacts
+dist/
+build/
+*.egg-info/
