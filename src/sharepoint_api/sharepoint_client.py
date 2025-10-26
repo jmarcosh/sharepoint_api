@@ -17,7 +17,7 @@ from datetime import datetime, timedelta, timezone
 
 class SharePointClient:
     def __init__(self, site:str):
-        self._local_config_path = "../credentials/secrets.toml"
+        self._local_config_path = "../../../credentials/secrets.toml"
         self.site = site
         self.is_local = self._is_local()
         self._load_config()
