@@ -9,3 +9,9 @@ env/
 dist/
 build/
 *.egg-info/
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/sharepoint_api.iml
+/.idea/vcs.xml
+/.idea/webResources.xml
