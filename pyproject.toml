@@ -15,7 +15,6 @@ dependencies = [
     "requests",
     "msal",
     "pandas",
-    "tomli; python_version<'3.11'",
     "openpyxl",
 ]
 
