@@ -16,8 +16,8 @@ from datetime import datetime, timedelta, timezone
 
 
 class SharePointClient:
-    def __init__(self, site:str):
-        self._local_config_path = "../../../credentials/secrets.toml"
+    def __init__(self, site:str, config_path:str=None):
+        self._local_config_path = config_path or "../../../credentials/secrets.toml"
         self.site = site
         self.is_local = self._is_local()
         self._load_config()
@@ -374,3 +374,14 @@ class SharePointClient:
                     continue  # Skip header
                 cell.number_format = '0'  # Integer format (no decimals, no scientific)
 
+
+    def list_files_in_folder(self, folder_path):
+        """
+        folder_path: path relative to root of the document library
+        returns: list of dicts with file info
+        """
+        url = f"https://graph.microsoft.com/v1.0/drives/{self.drive_id}/root:/{folder_path}:/children"
+        headers = self.headers.copy()
+        r = requests.get(url, headers=headers)
+        r.raise_for_status()
+        return r.json().get("value", [])
