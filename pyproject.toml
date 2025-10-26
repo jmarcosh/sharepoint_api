@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sharepoint-api"
+version = "0.1.0"
+description = "Utility scripts for API and SharePoint automation"
+authors = [{ name = "Joseph Marcos" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+
+dependencies = [
+    "requests",
+    "msal",
+    "pandas",
+    "tomli; python_version<'3.11'",
+    "openpyxl",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
