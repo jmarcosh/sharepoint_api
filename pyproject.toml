@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sharepoint-api"
-version = "0.1.3"
+version = "0.1.4"
 description = "Utility scripts for API and SharePoint automation"
 authors = [{ name = "Joseph Marcos" }]
 readme = "README.md"

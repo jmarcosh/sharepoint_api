@@ -16,10 +16,13 @@ from datetime import datetime, timedelta, timezone
 
 
 class SharePointClient:
-    def __init__(self, site:str, config_path:str=None):
+    def __init__(self, site:str, dry_run:bool=None, config_path:str=None):
         self._local_config_path = config_path or "../../../credentials/secrets.toml"
         self.site = site
         self.is_local = self._is_local()
+        self.dry_run = dry_run
+        if dry_run is None:
+            self.dry_run = self.is_local
         self._load_config()
         self._authenticate()
         self._get_site_and_drive_ids()
@@ -75,7 +78,7 @@ class SharePointClient:
         return df
 
     def save_excel(self, df: pd.DataFrame, file_path: str, sheet_name: str = "Sheet1", header: bool = True):
-        if self.is_local and "TEST" not in file_path:
+        if self.dry_run:
             return
         buffer = io.BytesIO()
         df.to_excel(buffer, index=False, na_rep="", header=header, sheet_name=sheet_name, engine="openpyxl")
@@ -118,7 +121,7 @@ class SharePointClient:
         :param sep: Field delimiter (default ','; use '\t' for tab-delimited .txt).
         :return: True if upload succeeded, False otherwise.
         """
-        if self.is_local:
+        if self.dry_run:
             return
         buffer = io.StringIO()
         df.to_csv(buffer, index=False, na_rep="", sep=sep)
@@ -156,7 +159,7 @@ class SharePointClient:
         :param save_local: If True, save the local file. Default is False.
         :return: True if upload succeeded, False otherwise.
         """
-        if self.is_local and not save_local:
+        if self.dry_run and not save_local:
             return True
         upload_url = f"https://graph.microsoft.com/v1.0/drives/{self.drive_id}/root:/{file_path}:/content"
         response = requests.put(
@@ -177,7 +180,7 @@ class SharePointClient:
         :param auto_adjust_columns: Whether to auto-adjust column widths for readability.
         :return: True if upload succeeded, False otherwise.
         """
-        if self.is_local:
+        if self.dry_run:
             return
         if len(dfs) != len(sheet_names):
             raise ValueError("Number of DataFrames and sheet names must be equal.")
@@ -227,7 +230,7 @@ class SharePointClient:
         :param folder_path: Folder path relative to SharePoint root (e.g., 'OC/Customer/2025/07/1234')
         :return: True if created successfully or already exists.
         """
-        if self.is_local:
+        if self.dry_run:
             return
         parts_lst = folder_path.strip("/").split("/")
         parent_path = parts_lst[0]
@@ -262,7 +265,7 @@ class SharePointClient:
         :param new_name: New name for the folder
         :return: True if renamed successfully.
         """
-        if self.is_local:
+        if self.dry_run:
             return
 
         folder_path = folder_path.strip("/")
@@ -311,7 +314,7 @@ class SharePointClient:
         """
         Saves a delivery note Excel file with special formatting.
         """
-        if self.is_local:
+        if self.dry_run:
             return
         buffer = io.BytesIO()
         df.to_excel(buffer, index=False, header=False, sheet_name=sheet_name, engine="openpyxl")
