@@ -16,8 +16,7 @@ from datetime import datetime, timedelta, timezone
 
 
 class SharePointClient:
-    def __init__(self, site:str, dry_run:bool=None, config_path:str=None):
-        self._local_config_path = config_path or "../../../credentials/secrets.toml"
+    def __init__(self, site:str, dry_run:bool=None):
         self.site = site
         self.is_local = self._is_local()
         self.dry_run = dry_run
@@ -27,11 +26,12 @@ class SharePointClient:
         self._authenticate()
         self._get_site_and_drive_ids()
 
-    def _is_local(self):
+    @staticmethod
+    def _is_local():
         # Example heuristic: check environment variable or file existence
-        abs_path = os.path.abspath(self._local_config_path)
-        if os.path.exists(abs_path):
-            return abs_path
+        env_path = os.getenv("SECRETS_PATH")
+        if env_path and os.path.exists(env_path):
+            return env_path
         return False
 
     def _load_config(self):
