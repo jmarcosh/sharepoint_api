@@ -72,9 +72,10 @@ class SharePointClient:
 
     def read_excel(self, file_path: str, sheet_name: str = 0) -> pd.DataFrame:
         file_url = f"https://graph.microsoft.com/v1.0/drives/{self.drive_id}/root:/{file_path}:/content"
-        response = requests.get(file_url, headers=self.headers)
+        response = requests.get(file_url, headers=self.headers, stream=True, timeout=120)
         response.raise_for_status()  # Raise an error for bad responses
-        df = pd.read_excel(io.BytesIO(response.content), sheet_name=sheet_name, engine="openpyxl")
+        content = b"".join(response.iter_content(chunk_size=65536))
+        df = pd.read_excel(io.BytesIO(content), sheet_name=sheet_name, engine="openpyxl")
         return df
 
     def save_excel(self, df: pd.DataFrame, file_path: str, sheet_name: str = "Sheet1", header: bool = True):
@@ -101,10 +102,11 @@ class SharePointClient:
         :return: pandas DataFrame.
         """
         file_url = f"https://graph.microsoft.com/v1.0/drives/{self.drive_id}/root:/{file_path}:/content"
-        response = requests.get(file_url, headers=self.headers)
-        response.raise_for_status()  # Raise exception for HTTP errors
+        response = requests.get(file_url, headers=self.headers, stream=True, timeout=120)
+        response.raise_for_status()
 
-        buffer = io.BytesIO(response.content)
+        content = b"".join(response.iter_content(chunk_size=65536))
+        buffer = io.BytesIO(content)
         try:
             df = pd.read_csv(buffer, sep=sep, encoding=encoding)
         except UnicodeDecodeError:
