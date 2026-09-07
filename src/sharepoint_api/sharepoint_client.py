@@ -385,8 +385,13 @@ class SharePointClient:
         folder_path: path relative to root of the document library
         returns: list of dicts with file info
         """
-        url = f"https://graph.microsoft.com/v1.0/drives/{self.drive_id}/root:/{folder_path}:/children"
+        url = f"https://graph.microsoft.com/v1.0/drives/{self.drive_id}/root:/{folder_path}:/children?$top=999"
         headers = self.headers.copy()
-        r = requests.get(url, headers=headers)
-        r.raise_for_status()
-        return r.json().get("value", [])
+        files = []
+        while url:
+            r = requests.get(url, headers=headers, timeout=120)
+            r.raise_for_status()
+            payload = r.json()
+            files.extend(payload.get("value", []))
+            url = payload.get("@odata.nextLink")
+        return files
